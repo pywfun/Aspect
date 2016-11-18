@@ -5,6 +5,7 @@ import {
   Text,
   View,
   TouchableHighlight,
+  TouchableOpacity,
   Dimensions,
   ScrollView,
   Alert,
@@ -12,8 +13,8 @@ import {
   DeviceEventEmitter,
 } from 'react-native';
 import Progress from 'react-native-progress/Circle';
-var szzf = require('./sz3.js');
-var szzs = require('./sz2.js');
+var szzf = require('./szzf.js');
+var szzs = require('./szzs.js');
 var DateTimePicker = require('react-native-datetime').default;
 var resultsCache = {
   aspectDate:{},//章节列表数据
@@ -65,6 +66,7 @@ class Main extends Component {
     this.picker = null;
   }
   componentDidMount() {
+
       this.subscription = DeviceEventEmitter.addListener('sendNeedAspect', (array)=>{
           needAspectCache = array;
           console.log('sendNeedAspect = ', needAspect);
@@ -77,8 +79,17 @@ class Main extends Component {
           showAll = show;
           console.log('showAll = ', show);
       });
+      let date = new Date();
       this.setState({
               progressNum:0,
+              startDate:date.getTime(),
+              startDateDay:date.getDate(),
+              startDateMonth:date.getMonth()+1,
+              startDateYear:date.getFullYear(),
+              endDate:date.getTime(),
+              endDateDay:date.getDate(),
+              endDateMonth:date.getMonth()+1,
+              endDateYear:date.getFullYear()    
             });
     }    
   componentWillUnmount(){
@@ -392,10 +403,12 @@ class Main extends Component {
                   let img5 = this.imageSrc(plant2.signame);
                   if(showDate){
                     let zf = global.sz[zfDay],zfshow;
-                    if(zf==undefined||zf=='')
+                    if(zf===undefined||zf==='')
                     {
                       zfshow='';
                     }
+                    else if(zf==0)
+                      zfshow = '0';
                     else
                       zfshow = zf.toFixed(2)+'%';
                     items[item]=(
@@ -448,28 +461,19 @@ class Main extends Component {
 	      <View style={styles.container}>
           <View style={{ borderColor:'#D4D4D4',borderWidth:1,}}>
   		      <View style={styles.container2}>
-    		      	<View style={styles.container3}>
-    		          <Button
-    		          color="#798BDA"   
-    		          onPress={()=>this.showDatePicker()}
-    		          label="开始日期"
-    		          />
-    		          <Text style={{fontSize:20}}>{this.state.startDateYear+'-'+this.state.startDateMonth+'-'+this.state.startDateDay}</Text>
-    		        </View>
-    		        <View style={styles.container3}>
-    		          <Button
-    		          color="#798BDA"   
-    		          onPress={()=>this.showDatePickerEnd()}
-    		          label="结束日期"
-    		          /> 
-    		          <Text style={{fontSize:20}}>{this.state.endDateYear+'-'+this.state.endDateMonth+'-'+this.state.endDateDay}</Text>
-    		        </View>              
+    		      	<TouchableOpacity style={styles.container3} onPress={()=>this.showDatePicker()}>
+    		          <Text style={{fontSize:20}}>起始:{this.state.startDateYear+'-'+this.state.startDateMonth+'-'+this.state.startDateDay}</Text>
+    		        </TouchableOpacity>
+                <Text>  ____  </Text>
+    		        <TouchableOpacity style={styles.container3} onPress={()=>this.showDatePickerEnd()}>
+    		          <Text style={{fontSize:20}}>结束:{this.state.endDateYear+'-'+this.state.endDateMonth+'-'+this.state.endDateDay}</Text>
+    		        </TouchableOpacity>              
   	          </View>
               <View style={styles.subimt}>
                   <Button
                   color="#798BDA"   
                   onPress={()=>this.UpdateDate()}
-                  label="开始计算"
+                  label="运行"
                   />
               </View>
             </View>
@@ -491,13 +495,16 @@ const styles = StyleSheet.create({
     backgroundColor:'#FFF',
   },
   container2: {
-    height:120,
-    justifyContent: 'space-between',
+    height:45,
+    flexDirection: 'row',
+    justifyContent: 'center',
     padding:10,
 
   },
   container3: {
     flexDirection: 'row',
+    borderColor:'#D4D4D4',
+    borderWidth:1,
   },
   container4: {
     flex: 1,
@@ -508,7 +515,7 @@ const styles = StyleSheet.create({
    },
   subimt: {
     alignItems: 'center',
-    margin: 10,
+    margin: 3,
   },
   instructions: {
     textAlign: 'center',
@@ -516,8 +523,8 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   button: {
-    width: (Dimensions.get('window').width-30)/3,
-    height:40,
+    width: 80,
+    height:30,
     borderRadius:20,
     alignItems: 'center',
     justifyContent: 'center',
