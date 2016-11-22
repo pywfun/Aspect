@@ -60,8 +60,11 @@ class Main extends Component {
       endDateDay:'',
       endDateMonth:'',
       endDateYear:'',
+      astroHour:'00',
+      astroMin:'00',
       dateList:{},
       date:new Date(),
+      dateH:new Date(),
       progressNum:0};
     this.picker = null;
   }
@@ -126,9 +129,13 @@ class Main extends Component {
         });
     }    
     showTimePicker() {
-        var date = this.state.date;
-        this.picker.showTimePicker(date, (d)=>{
-            this.setState({date:d.getDay()});
+        var dateH = this.state.dateH;
+        this.picker.showTimePicker(dateH, (d)=>{
+            this.setState({
+              dateH:d,
+              astroHour:d.getHours(),
+              astroMin:d.getMinutes()
+            });
         });
     }
     showDateTimePicker() {
@@ -163,7 +170,7 @@ class Main extends Component {
       let year = date.getFullYear();
       var coDay = year+'-'+month+'-'+day;
       url = 'http://www.nodoor.com/wheelDetail.do';
-      data = "selectWheel=Natal&userName=mm&userGender=%E5%A5%B3&astroHour=0&astroMin=0&boroughs=310105&astroDate=";
+      data = "selectWheel=Natal&userName=mm&userGender=%E5%A5%B3&boroughs=310105";
       var fetchOptions = {
         method: 'POST',
         headers: {
@@ -171,7 +178,7 @@ class Main extends Component {
           //表单
           'Content-Type': 'application/x-www-form-urlencoded'
         },
-        body:'data='+data+coDay+''
+        body:'data='+data+'&astroHour='+this.state.astroHour+'&astroMin='+this.state.astroMin+'&astroDate='+coDay+''
       };
 
       fetch(url,fetchOptions)
@@ -469,12 +476,17 @@ class Main extends Component {
     		          <Text style={{fontSize:20}}>结束:{this.state.endDateYear+'-'+this.state.endDateMonth+'-'+this.state.endDateDay}</Text>
     		        </TouchableOpacity>              
   	          </View>
-              <View style={styles.subimt}>
-                  <Button
-                  color="#798BDA"   
-                  onPress={()=>this.UpdateDate()}
-                  label="运行"
-                  />
+              <View style={styles.container2}>
+                <TouchableOpacity style={styles.container3} onPress={()=>this.showTimePicker()}>
+                  <Text style={{fontSize:20}}>每天时间:{this.state.astroHour+':'+this.state.astroMin}</Text>
+                </TouchableOpacity>              
+                <Text>                   </Text>
+                    <Button
+                    color="#798BDA"   
+                    onPress={()=>this.UpdateDate()}
+                    label="运行"
+                    />
+                
               </View>
             </View>
             <View style={styles.container4}>
